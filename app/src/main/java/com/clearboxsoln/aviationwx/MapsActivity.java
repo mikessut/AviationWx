@@ -2,6 +2,7 @@ package com.clearboxsoln.aviationwx;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,12 +11,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity
+        implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.v("ME","Hello World. onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -42,6 +45,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng sydney = new LatLng(-34, 151);
         LatLng ssi = new LatLng(31.1519722,-81.3910556);
         mMap.addMarker(new MarkerOptions().position(ssi).title("Marker at KSSI"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(ssi));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ssi, 6.5f));
+
+        MapListener ml = new MapListener(googleMap);
+        mMap.setOnCameraIdleListener(ml);
+        mMap.setOnMapClickListener(ml);
     }
+
 }
