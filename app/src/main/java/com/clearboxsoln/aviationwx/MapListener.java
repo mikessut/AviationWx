@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 
 public class MapListener implements GoogleMap.OnCameraIdleListener,
-    GoogleMap.OnMapClickListener {
+    GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
 
@@ -32,8 +32,8 @@ public class MapListener implements GoogleMap.OnCameraIdleListener,
     }
 
     @Override
-    public void onMapClick(LatLng latLng) {
-        Log.v("AviationWx",String.format("onMapClick:"));
+    public void onMapLongClick(LatLng latLng) {
+        Log.v("AviationWx",String.format("onMapLongClick:"));
 
         LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
 

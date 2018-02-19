@@ -1,5 +1,8 @@
 package com.clearboxsoln.aviationwx;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +11,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -44,12 +49,13 @@ public class MapsActivity extends FragmentActivity
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         LatLng ssi = new LatLng(31.1519722,-81.3910556);
-        mMap.addMarker(new MarkerOptions().position(ssi).title("Marker at KSSI"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ssi, 6.5f));
+        //mMap.addMarker(new MarkerOptions().position(ssi).title("Marker at KSSI"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ssi, 7.7f));
 
         MapListener ml = new MapListener(googleMap);
         mMap.setOnCameraIdleListener(ml);
-        mMap.setOnMapClickListener(ml);
+        mMap.setOnMapLongClickListener(ml);
+
     }
 
 }

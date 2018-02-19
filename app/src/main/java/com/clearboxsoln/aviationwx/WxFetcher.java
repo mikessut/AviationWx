@@ -1,6 +1,9 @@
 package com.clearboxsoln.aviationwx;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -16,9 +19,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by mikes on 2/18/2018.
@@ -41,6 +47,12 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
     Exception mE;
 
     private GoogleMap mMap;
+
+    private static int GREEN = 0x7f39c134;
+    private static int BLUE = 0x7f5c42f4;
+    private static int RED = 0x7ff44242;
+    private static int PURPLE = 0x7fe242f4;
+    private static int GRAY = 0x7f9ea39e;
 
     public WxFetcher(GoogleMap map) {
         mMap = map;
@@ -74,6 +86,37 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
         return new JSONObject();
     }
 
+    /**
+     *
+     *
+     int d = 50; // diameter
+     Bitmap bm = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
+     Canvas c = new Canvas(bm);
+     Paint p = new Paint();
+     p.setColor(0x7fff0003);
+     c.drawCircle(d/2, d/2, d/2, p);
+
+     // generate BitmapDescriptor from circle Bitmap
+     BitmapDescriptor bmD = BitmapDescriptorFactory.fromBitmap(bm);
+     mMap.addMarker(new MarkerOptions().
+     position(ssi).
+     icon(bmD).
+     title("Marker at KSSI"));
+
+     * @param result
+     */
+    private BitmapDescriptor getMarker(int color) {
+        int d = 50; // diameter
+        Bitmap bm = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bm);
+        Paint p = new Paint();
+        p.setColor(color);
+        c.drawCircle(d/2, d/2, d/2, p);
+
+        // generate BitmapDescriptor from circle Bitmap
+        return BitmapDescriptorFactory.fromBitmap(bm);
+    }
+
     @Override
     protected void onPostExecute(JSONObject result) {
         LatLng ssi = new LatLng(31.1519722,-81.3910556);
@@ -85,11 +128,30 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
 
                 LatLng center = new LatLng((double)coords.get(1), (double)coords.get(0));
 
-                mMap.addCircle(new CircleOptions()
-                        .center(center)
-                        .radius(10000)
-                        .strokeColor(Color.RED)
-                        .fillColor(Color.BLUE));
+                BitmapDescriptor marker = getMarker(GRAY);
+                String rawOb = "UNKN";
+                try {
+                    int ceil = airport.getJSONObject("properties").getInt("ceil");
+                    double visib = airport.getJSONObject("properties").getDouble("visib");
+                    rawOb = airport.getJSONObject("properties").getString("rawOb");
+
+                    if ( (ceil <= 5) || (visib <= 1)) {
+                        marker = getMarker(PURPLE);
+                    } else if ( ((ceil > 5) && (ceil <= 10)) || ((visib > 1) && (visib <= 3)) ) {
+                        marker = getMarker(RED);
+                    } else if ( ((ceil > 10) && (ceil <= 30)) || ((visib > 3) && (visib <= 5)) ) {
+                        marker = getMarker(BLUE);
+                    } else if ( ((ceil > 5) && (ceil <= 10)) || ((visib > 1) && (visib <= 3)) ) {
+                        marker = getMarker(GREEN);
+                    }
+                } catch (JSONException ex) {
+                    Log.e("AviationWx",ex.toString());
+                }
+
+                mMap.addMarker(new MarkerOptions().
+                        position(center).
+                        icon(marker).
+                        title(rawOb));
             }
         } catch (JSONException ex) {
             Log.e("AviationWx",ex.toString());
