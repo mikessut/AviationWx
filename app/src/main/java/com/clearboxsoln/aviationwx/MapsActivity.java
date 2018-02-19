@@ -1,25 +1,23 @@
 package com.clearboxsoln.aviationwx;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import android.content.pm.PackageManager;
+import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity
-        implements OnMapReadyCallback {
+        implements OnMapReadyCallback, FragmentCompat.OnRequestPermissionsResultCallback {
 
     private GoogleMap mMap;
+    private static int MY_LOCATION_REQUEST_CODE = 1234;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +50,42 @@ public class MapsActivity extends FragmentActivity
         //mMap.addMarker(new MarkerOptions().position(ssi).title("Marker at KSSI"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ssi, 7.7f));
 
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_LOCATION_REQUEST_CODE);
+        } else {
+            mMap.setMyLocationEnabled(true);
+        }
+
         MapListener ml = new MapListener(googleMap);
         mMap.setOnCameraIdleListener(ml);
         mMap.setOnMapLongClickListener(ml);
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == MY_LOCATION_REQUEST_CODE) {
+            // Major fight trying to get this to work.  Using example from documentation simply doesn't
+            // seem to work. Don't really know why.  When I step through in debugger, it looks like
+            // we why get inside the if statement (one commented out), but we never do.
+
+
+            // Log.v("DBG1",Integer.toString(permissions.length));
+            // Log.v("DBG1",permissions[0]);
+            // Log.v("DBG1",android.Manifest.permission.ACCESS_FINE_LOCATION);
+            // Log.v("DBG1",Integer.toString(grantResults[0]));
+            // Log.v("DBG1",Integer.toString(PackageManager.PERMISSION_GRANTED));
+            // if ((permissions.length == 1) &&
+            //         (permissions[0] == android.Manifest.permission.ACCESS_FINE_LOCATION) &&
+            //         (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                mMap.setMyLocationEnabled(true);
+            }
+            //}
+        }
     }
 
 }
