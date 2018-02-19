@@ -119,7 +119,8 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject result) {
-        LatLng ssi = new LatLng(31.1519722,-81.3910556);
+        mMap.clear();
+
         try {
             JSONArray airports = result.getJSONArray(("features"));
             for (int i = 0; i < airports.length(); i++) {
@@ -131,7 +132,9 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
                 BitmapDescriptor marker = getMarker(GRAY);
                 String rawOb = "UNKN";
                 try {
-                    int ceil = airport.getJSONObject("properties").getInt("ceil");
+                    int ceil = Integer.MAX_VALUE;
+                    if (airport.getJSONObject("properties").has("ceil"))
+                        ceil = airport.getJSONObject("properties").getInt("ceil");
                     double visib = airport.getJSONObject("properties").getDouble("visib");
                     rawOb = airport.getJSONObject("properties").getString("rawOb");
 
@@ -141,7 +144,7 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
                         marker = getMarker(RED);
                     } else if ( ((ceil > 10) && (ceil <= 30)) || ((visib > 3) && (visib <= 5)) ) {
                         marker = getMarker(BLUE);
-                    } else if ( ((ceil > 5) && (ceil <= 10)) || ((visib > 1) && (visib <= 3)) ) {
+                    } else if ( (ceil > 30) && (visib > 3) ) {
                         marker = getMarker(GREEN);
                     }
                 } catch (JSONException ex) {
