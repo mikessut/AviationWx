@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -18,6 +19,8 @@ public class MapsActivity extends FragmentActivity
 
     private GoogleMap mMap;
     private static int MY_LOCATION_REQUEST_CODE = 1234;
+
+    private MapListener ml;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +61,15 @@ public class MapsActivity extends FragmentActivity
             mMap.setMyLocationEnabled(true);
         }
 
-        MapListener ml = new MapListener(googleMap);
+        ml = new MapListener(googleMap);
         mMap.setOnCameraIdleListener(ml);
         mMap.setOnMapLongClickListener(ml);
+
+        Button metar_button = (Button) findViewById(R.id.radioMETAR);
+        Button taf_button = (Button) findViewById(R.id.radioTAF);
+
+        metar_button.setOnClickListener(ml);
+        taf_button.setOnClickListener(ml);
 
     }
 

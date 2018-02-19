@@ -39,6 +39,9 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
      *
      * http://aviationweather.gov/gis/scripts/MetarJSON.php?zoom=9&filter=prior&density=0&taf=false
      *   &bbox=-83.227132449815,30.662734846156,-80.480550418565,32.127979772662
+     *
+     *   TAF:
+     *   http://aviationweather.gov/gis/scripts/TafJSON.php?fore=0&filter=prior&density=0&metar=false&tempo=false&bbox=-85.265929296875,30.900184422654,-79.772765234375,33.800195317174
      */
 
     static String URL_BASE = "http://aviationweather.gov/gis/scripts/MetarJSON.php";
