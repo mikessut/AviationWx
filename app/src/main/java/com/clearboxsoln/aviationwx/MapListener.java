@@ -2,6 +2,7 @@ package com.clearboxsoln.aviationwx;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -19,21 +20,28 @@ public class MapListener implements GoogleMap.OnCameraIdleListener,
 
     private GoogleMap mMap;
 
+
+    public enum QueryType {METAR, TAF};
+    private QueryType mQueryType;
+
+
     public MapListener(GoogleMap gmap) {
         mMap = gmap;
+        mQueryType = QueryType.METAR;
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.radioMETAR) {
-            setMETAR();
-        } else if (view.getId() == R.id.radioTAF) {
+        View parent = (View)view.getParent();
+        Button b = (Button) parent.findViewById(R.id.toggle);
+        if (mQueryType == QueryType.METAR) {
             setTAF();
+            b.setText("TAF");
+        } else if (mQueryType == QueryType.TAF) {
+            setMETAR();
+            b.setText("METAR");
         }
     }
-
-    public enum QueryType {METAR, TAF};
-    private QueryType mQueryType;
 
     public void setMETAR() { mQueryType = QueryType.METAR; }
     public void setTAF() { mQueryType = QueryType.TAF; }
@@ -51,7 +59,7 @@ public class MapListener implements GoogleMap.OnCameraIdleListener,
 
         LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
 
-        WxFetcher wxf = new WxFetcher(mMap);
+        WxFetcher wxf = new WxFetcher(mMap, mQueryType);
         wxf.execute(bounds);
 
     }

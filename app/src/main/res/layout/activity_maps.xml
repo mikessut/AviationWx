@@ -14,46 +14,14 @@
         android:layout_height="match_parent"
         tools:context="com.clearboxsoln.aviationwx.MapsActivity" />
 
+    <Button
+        android:id="@+id/toggle"
+        android:layout_width="80dp"
+        android:layout_height="35dp"
+        android:layout_weight="1"
+        android:background="@color/radiobutton_bg"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="METAR"
+        android:textColor="@color/textcolor_radiobutton" />
 
-    <RadioGroup
-        android:id="@+id/radio_group_list_selector"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:orientation="horizontal"
-        android:background="#80000000"
-        android:padding="4dp" >
-
-        <RadioButton
-            android:id="@+id/radioMETAR"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="METAR"
-            android:gravity="center_horizontal|center_vertical"
-            android:layout_weight="1"
-            android:background="@color/radiobutton_bg"
-            android:textColor="@color/textcolor_radiobutton" />
-        <View
-            android:id="@+id/VerticalLine"
-            android:layout_width="1dip"
-            android:layout_height="match_parent"
-            android:background="#aaa" />
-
-        <RadioButton
-            android:id="@+id/radioTAF"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="TAF"
-            android:layout_weight="1"
-            android:background="@color/radiobutton_bg"
-            android:textColor="@color/textcolor_radiobutton" />
-
-        <View
-            android:id="@+id/VerticalLine2"
-            android:layout_width="1dip"
-            android:layout_height="match_parent"
-            android:background="#aaa" />
-
-
-    </RadioGroup>
 </FrameLayout>

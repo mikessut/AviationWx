@@ -1,18 +1,25 @@
 package com.clearboxsoln.aviationwx;
 
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, FragmentCompat.OnRequestPermissionsResultCallback {
@@ -65,11 +72,38 @@ public class MapsActivity extends FragmentActivity
         mMap.setOnCameraIdleListener(ml);
         mMap.setOnMapLongClickListener(ml);
 
-        Button metar_button = (Button) findViewById(R.id.radioMETAR);
-        Button taf_button = (Button) findViewById(R.id.radioTAF);
+        Button toggle = (Button) findViewById(R.id.toggle);
 
-        metar_button.setOnClickListener(ml);
-        taf_button.setOnClickListener(ml);
+        toggle.setOnClickListener(ml);
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+
+                LinearLayout info = new LinearLayout(MapsActivity.this);
+                info.setOrientation(LinearLayout.VERTICAL);
+
+                TextView title = new TextView(MapsActivity.this);
+                title.setTextColor(Color.BLACK);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
+                title.setText(marker.getTitle());
+
+                TextView snippet = new TextView(MapsActivity.this);
+                snippet.setTextColor(Color.GRAY);
+                snippet.setText(marker.getSnippet());
+
+                info.addView(title);
+                info.addView(snippet);
+
+                return info;
+            }
+        });
 
     }
 

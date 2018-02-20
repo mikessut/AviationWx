@@ -3,6 +3,6 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="textcolor_radiobutton">#010101</color>
-    <color name="radiobutton_bg">#505050</color>
+    <color name="textcolor_radiobutton">#676767</color>
+    <color name="radiobutton_bg">#fdfbfa</color>
 </resources>
