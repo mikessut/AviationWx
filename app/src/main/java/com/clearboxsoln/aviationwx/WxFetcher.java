@@ -165,12 +165,14 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
 
                 BitmapDescriptor marker = getMarker(GRAY);
                 String rawOb = "UNKN";
+                LineBreaker b = new LineBreaker(rawOb);
                 try {
                     int ceil = Integer.MAX_VALUE;
                     if (airport.getJSONObject("properties").has("ceil"))
                         ceil = airport.getJSONObject("properties").getInt("ceil");
                     double visib = airport.getJSONObject("properties").getDouble("visib");
                     rawOb = airport.getJSONObject("properties").getString("rawOb");
+                    b.parse(rawOb);
 
                     if ( (ceil <= 5) || (visib <= 1)) {
                         marker = getMarker(PURPLE);
@@ -188,7 +190,7 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
                 mMap.addMarker(new MarkerOptions().
                         position(center).
                         icon(marker).
-                        title(rawOb));
+                        title(b.getTitle()).snippet(b.getSnippet()));
             }
         } catch (JSONException ex) {
             Log.e("AviationWx",ex.toString());
@@ -259,7 +261,7 @@ class LineBreaker {
             snippet = "";
             return;
         }
-        int space2 = txt.indexOf(" ", space1);
+        int space2 = txt.indexOf(" ", space1+1);
         if (space2 == -1) {
             title = txt;
             snippet = "";
@@ -269,15 +271,22 @@ class LineBreaker {
         title = txt.substring(0,space2);
 
         snippet = "";
-        int pos = space2;
+        int pos = space2+1;
         while (pos < txt.length()) {
-            int break_space = txt.indexOf(" ",pos + BREAK_LEN);
-            if (break_space == -1) {
-                snippet += txt.substring(pos);
-                pos = Integer.MAX_VALUE;
+            // Try to break on a 'FM'
+            int fm_pos = txt.indexOf(" FM",pos);
+            if (fm_pos > 0) {
+                snippet += txt.substring(pos, fm_pos) + "\n";
+                pos = fm_pos + 1;
             } else {
-                snippet += txt.substring(pos, break_space) + "\n";
-                pos = break_space;
+                int break_space = txt.indexOf(" ", pos + BREAK_LEN);
+                if (break_space == -1) {
+                    snippet += txt.substring(pos);
+                    pos = Integer.MAX_VALUE;
+                } else {
+                    snippet += txt.substring(pos, break_space) + "\n";
+                    pos = break_space+1;
+                }
             }
         }
     }

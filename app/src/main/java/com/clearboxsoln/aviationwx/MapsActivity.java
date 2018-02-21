@@ -90,7 +90,7 @@ public class MapsActivity extends FragmentActivity
 
                 TextView title = new TextView(MapsActivity.this);
                 title.setTextColor(Color.BLACK);
-                title.setGravity(Gravity.CENTER);
+                title.setGravity(Gravity.LEFT);
                 title.setTypeface(null, Typeface.BOLD);
                 title.setText(marker.getTitle());
 
