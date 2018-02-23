@@ -16,11 +16,13 @@ Once app is up and running, a long tap will query METARs for what's shown on scr
 I'd love help making this app better.  Here's the things I have in mind.
 
 * Make sure another developer can get up and running (have I included essential files in git?)
-* About tab to steer folks to github
+* About tab to steer folks to github and give instructions
+* Change the long click for query? Not intuitive for a new user. Maybe an HOWTO note?
 * Radar overlay
 * Be smart about which stations to display. (I think this is done with the density=prior)
 * Ability to switch to satellite or terrain google map views
-* Use phone's position to center map. (Done -- but first callback from request doesn't seem to work quite right.)
+* Use phone's position to center map. 
+* Get testing framework up and running.
 * Wind barbs - Could be implemented with features built into aviationweather.gov
 * TAF (DONE)
-* PIREPs - (DONE - but icon could be much better)
+* PIREPs - (DONE - but icons could be much better)
