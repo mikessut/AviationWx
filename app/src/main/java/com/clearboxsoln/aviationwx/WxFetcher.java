@@ -36,20 +36,27 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
      * Documentation
      * https://www.aviationweather.gov/help/webservice?page=metarjson
      *
-     *
+     * METAR:
      * http://aviationweather.gov/gis/scripts/MetarJSON.php?zoom=9&filter=prior&density=0&taf=false
      *   &bbox=-83.227132449815,30.662734846156,-80.480550418565,32.127979772662
      *
-     *   TAF:
-     *   http://aviationweather.gov/gis/scripts/TafJSON.php?fore=0&filter=prior&density=0&metar=false&tempo=false&bbox=-85.265929296875,30.900184422654,-79.772765234375,33.800195317174
+     * TAF:
+     * http://aviationweather.gov/gis/scripts/TafJSON.php?fore=0&filter=prior&density=0&metar=false&tempo=false&bbox=-85.265929296875,30.900184422654,-79.772765234375,33.800195317174
      *
-     *   Documentation:
-     *   https://www.aviationweather.gov/help/webservice?page=tafjson
+     * Documentation:
+     * https://www.aviationweather.gov/help/webservice?page=tafjson
+     *
+     * PIREPs:
+     * http://aviationweather.gov/gis/scripts/AirepJSON.php?zoom=6&type=all&bbox=-91.280528125,27.178390814409,-69.307871875,38.682053837383
+     *
+     * RADAR:
+     * http://aviationweather.gov/cgi-bin/tilecache/tc.php?product=rad_rala&date=20180221201000&x=16&y=39&z=6
+     *
      */
 
     static String URL_BASE_METAR = "http://aviationweather.gov/gis/scripts/MetarJSON.php";
     static String URL_BASE_TAF = "http://aviationweather.gov/gis/scripts/TafJSON.php";
-    static String testURL = "http://aviationweather.gov/gis/scripts/MetarJSON.php?zoom=9&filter=prior&density=0&taf=false&bbox=-83.227132449815,30.662734846156,-80.480550418565,32.127979772662";
+    static String URL_BASE_PIREP = "http://aviationweather.gov/gis/scripts/AirepJSON.php";
 
     Exception mE;
 
@@ -75,10 +82,15 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
 
         String urlString;
         if (mQueryType == MapListener.QueryType.METAR) {
-            urlString = URL_BASE_METAR + String.format("?density=all&bbox=%f,%f,%f,%f", ll.longitude, ll.latitude,
+            //urlString = URL_BASE_METAR + String.format("?density=all&bbox=%f,%f,%f,%f",
+            urlString = URL_BASE_METAR + String.format("?filter=prior&bbox=%f,%f,%f,%f",
+                    ll.longitude, ll.latitude,
                     ur.longitude, ur.latitude);
         } else if (mQueryType == MapListener.QueryType.TAF) {
             urlString = URL_BASE_TAF + String.format("?density=all&bbox=%f,%f,%f,%f", ll.longitude, ll.latitude,
+                    ur.longitude, ur.latitude);
+        } else if (mQueryType == MapListener.QueryType.PIREP) {
+            urlString = URL_BASE_PIREP + String.format("?type=all&bbox=%f,%f,%f,%f", ll.longitude, ll.latitude,
                     ur.longitude, ur.latitude);
         } else {
             throw new RuntimeException("Unknown query type.");
@@ -89,6 +101,8 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(4000);
+            conn.setReadTimeout(4000);
             conn.setRequestMethod("GET");
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
@@ -101,30 +115,12 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
             rd.close();
             return new JSONObject(s);
         } catch (IOException | JSONException ex) {
+            Log.e("AviationWx","Exception during JSON request: " + ex.toString());
             mE = ex;
         }
         return new JSONObject();
     }
 
-    /**
-     *
-     *
-     int d = 50; // diameter
-     Bitmap bm = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
-     Canvas c = new Canvas(bm);
-     Paint p = new Paint();
-     p.setColor(0x7fff0003);
-     c.drawCircle(d/2, d/2, d/2, p);
-
-     // generate BitmapDescriptor from circle Bitmap
-     BitmapDescriptor bmD = BitmapDescriptorFactory.fromBitmap(bm);
-     mMap.addMarker(new MarkerOptions().
-     position(ssi).
-     icon(bmD).
-     title("Marker at KSSI"));
-
-     * @param result
-     */
     private BitmapDescriptor getMarker(int color) {
         int d = 50; // diameter
         Bitmap bm = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
@@ -147,6 +143,9 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
                 break;
             case TAF:
                 plotTAF(result);
+                break;
+            case PIREP:
+                plotPIREP(result);
                 break;
             default:
                 break;
@@ -183,6 +182,37 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
                     } else if ( (ceil > 30) && (visib > 3) ) {
                         marker = getMarker(GREEN);
                     }
+                } catch (JSONException ex) {
+                    Log.e("AviationWx",ex.toString());
+                }
+
+                mMap.addMarker(new MarkerOptions().
+                        position(center).
+                        icon(marker).
+                        title(b.getTitle()).snippet(b.getSnippet()));
+            }
+        } catch (JSONException ex) {
+            Log.e("AviationWx",ex.toString());
+        }
+    }
+
+    protected void plotPIREP(JSONObject result) {
+        try {
+            JSONArray airports = result.getJSONArray(("features"));
+            for (int i = 0; i < airports.length(); i++) {
+                JSONObject airport = (JSONObject)airports.get(i);
+                JSONArray coords = airport.getJSONObject("geometry").getJSONArray("coordinates");
+
+                LatLng center = new LatLng((double)coords.get(1), (double)coords.get(0));
+
+                BitmapDescriptor marker = getMarker(GRAY);
+                String rawOb = "UNKN";
+                LineBreaker b = new LineBreaker(rawOb);
+                try {
+
+                    rawOb = airport.getJSONObject("properties").getString("rawOb");
+                    b.parse(rawOb);
+
                 } catch (JSONException ex) {
                     Log.e("AviationWx",ex.toString());
                 }

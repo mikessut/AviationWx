@@ -21,7 +21,7 @@ public class MapListener implements GoogleMap.OnCameraIdleListener,
     private GoogleMap mMap;
 
 
-    public enum QueryType {METAR, TAF};
+    public enum QueryType {METAR, TAF, PIREP};
     private QueryType mQueryType;
 
 
@@ -38,6 +38,9 @@ public class MapListener implements GoogleMap.OnCameraIdleListener,
             setTAF();
             b.setText("TAF");
         } else if (mQueryType == QueryType.TAF) {
+            setPIREP();
+            b.setText("PIREP");
+        } else if (mQueryType == QueryType.PIREP) {
             setMETAR();
             b.setText("METAR");
         }
@@ -45,12 +48,13 @@ public class MapListener implements GoogleMap.OnCameraIdleListener,
 
     public void setMETAR() { mQueryType = QueryType.METAR; }
     public void setTAF() { mQueryType = QueryType.TAF; }
+    public void setPIREP() { mQueryType = QueryType.PIREP; }
 
     @Override
     public void onCameraIdle() {
         LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
         float z = mMap.getCameraPosition().zoom;
-        Log.v("AviationWx",String.format("onCameraIdle: %s, %f", bounds, z));
+        //Log.v("AviationWx",String.format("onCameraIdle: %s, %f", bounds, z));
     }
 
     @Override

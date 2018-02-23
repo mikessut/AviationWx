@@ -55,10 +55,10 @@ public class MapsActivity extends FragmentActivity
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        LatLng ssi = new LatLng(31.1519722,-81.3910556);
+        //LatLng sydney = new LatLng(-34, 151);
+        //LatLng ssi = new LatLng(31.1519722,-81.3910556);
         //mMap.addMarker(new MarkerOptions().position(ssi).title("Marker at KSSI"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ssi, 7.7f));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ssi, 7.7f));
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
