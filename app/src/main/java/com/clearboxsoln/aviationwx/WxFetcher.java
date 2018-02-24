@@ -54,9 +54,9 @@ extends AsyncTask<LatLngBounds, Void, JSONObject> {
      *
      */
 
-    static String URL_BASE_METAR = "http://aviationweather.gov/gis/scripts/MetarJSON.php";
-    static String URL_BASE_TAF = "http://aviationweather.gov/gis/scripts/TafJSON.php";
-    static String URL_BASE_PIREP = "http://aviationweather.gov/gis/scripts/AirepJSON.php";
+    static String URL_BASE_METAR = "https://aviationweather.gov/gis/scripts/MetarJSON.php";
+    static String URL_BASE_TAF = "https://aviationweather.gov/gis/scripts/TafJSON.php";
+    static String URL_BASE_PIREP = "https://aviationweather.gov/gis/scripts/AirepJSON.php";
 
     Exception mE;
 

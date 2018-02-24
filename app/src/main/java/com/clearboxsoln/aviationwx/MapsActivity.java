@@ -3,6 +3,7 @@ package com.clearboxsoln.aviationwx;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -14,12 +15,15 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, FragmentCompat.OnRequestPermissionsResultCallback {
@@ -27,17 +31,21 @@ public class MapsActivity extends FragmentActivity
     private GoogleMap mMap;
     private static int MY_LOCATION_REQUEST_CODE = 1234;
 
+    private FusedLocationProviderClient mFusedLocationClient;
+    private boolean mInitPos = false;
+
     private MapListener ml;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v("ME","Hello World. onCreate()");
+        //Log.v("AviationWx","onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
 
@@ -104,6 +112,21 @@ public class MapsActivity extends FragmentActivity
                 return info;
             }
         });
+
+        // set initial position
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if ( !mInitPos && (location != null)) {
+                            // Logic to handle location object
+                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 7.7f));
+                            mInitPos = true;
+                        }
+                    }
+                });
 
     }
 
